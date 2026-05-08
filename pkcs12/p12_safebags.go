@@ -298,6 +298,11 @@ func (this *PKCS12) decodeSecretBag(asn1Data []byte, password []byte) (secretKey
     if bag.SecretTypeID.Equal(oidPKCS8ShroundedKeyBag) {
         decrypted, err = pbes1.DecryptPKCS8PrivateKey(data, password)
         if err != nil {
+            passwordString, err := decodeBMPString(password)
+            if err != nil {
+                return nil, err
+            }
+            password = []byte(passwordString)
             decrypted, err = pbes2.DecryptPKCS8PrivateKey(data, password)
             if err != nil {
                 return nil, errors.New("go-cryptobin/pkcs12: error decrypting PKCS#8: " + err.Error())
